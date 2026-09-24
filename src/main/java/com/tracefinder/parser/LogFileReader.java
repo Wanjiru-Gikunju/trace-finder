@@ -8,7 +8,7 @@ import java.util.List;
 public class LogFileReader {
 
     public List<String> readLines(String filePath) throws IOException {
-        Path path = path.of(filePath);
+        Path path = Path.of(filePath);
         return Files.readAllLines(path);
     }
     
