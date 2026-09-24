@@ -10,7 +10,7 @@ public class LogFileProcessor {
      private final LogParser parser = new LogParser();
 
     public ParsedLog parseLines(List<String> rawLines) {
-        List<LogEntry> entries = new ArrayList<>();
+        List<NumberedEntry> entries = new ArrayList<>();
         List<MalformedLine> malformedLines = new ArrayList<>();
 
         for (int i = 0; i < rawLines.size(); i++) {
@@ -20,7 +20,7 @@ public class LogFileProcessor {
             ParseResult result = parser.parseLine(line, lineNumber);
 
             if (result.getEntry() != null) {
-                entries.add(result.getEntry());
+                entries.add(new NumberedEntry(lineNumber, result.getEntry()));
             } else {
                 malformedLines.add(result.getMalformedLine());
             }
