@@ -1,6 +1,7 @@
 package com.tracefinder.analyzer;
 
 import com.tracefinder.model.LogEntry;
+import com.tracefinder.model.UnknownPattern;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,5 +36,49 @@ public class Analyzer {
     return flagged;
   
    }
-   
+   public List<SuspiciousIp> buildSuspiciousIps(Map<LogEntry, Integer> scoredEntries) {
+    Map<String, List<LogEntry>> entriesByIp = new HashMap<>();
+
+    for (LogEntry entry : scoredEntries.keySet()) {
+        String ip = entry.sourceIp();
+        entriesByIp.computeIfAbsent(ip, key -> new ArrayList<>()).add(entry);
+    }
+
+    List<SuspiciousIp> suspiciousIps = new ArrayList<>();
+
+    for (Map.Entry<String, List<LogEntry>> ipGroup : entriesByIp.entrySet()) {
+        String ip = ipGroup.getKey();
+        List<LogEntry> entriesForIp = ipGroup.getValue();
+
+        boolean hasFlaggedEntry = false;
+        for (LogEntry entry : entriesForIp) {
+            if (scoredEntries.get(entry) >= 3) {
+                hasFlaggedEntry = true;
+                break;
+            }
+        }
+
+        if (hasFlaggedEntry) {
+            suspiciousIps.add(new SuspiciousIp(ip, entriesForIp.size()));
+        }
+    }
+
+    suspiciousIps.sort(Comparator.comparingLong(SuspiciousIp::entryCount).reversed());
+
+    return suspiciousIps;
+  }
+
+    public List<UnknownPattern> buildUnknownPatterns(List<UnknownPattern> unknownPatterns) {
+        return new ArrayList<>(unknownPatterns);
+    }
+
+    public AnalysisResult analyze(List<LogEntry> knownEntries, Map<LogEntry, Integer> scoredEntries, List<UnknownPattern> unknownPatterns) {
+        Map<String, Integer> summary = buildActivitySummary(knownEntries);
+        List<LogEntry> flagged = buildFlaggedEntries(scoredEntries);
+        List<SuspiciousIp> suspicious = buildSuspiciousIps(scoredEntries);
+        List<UnknownPattern> unknown = buildUnknownPatterns(unknownPatterns);
+
+        return new AnalysisResult(summary, flagged, suspicious, unknown);
+    }
+
 }

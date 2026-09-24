@@ -30,26 +30,46 @@ class AnalyzerTest {
     }
 
     @Test
-void entryBelowThreeIsNotFlagged() {
-    Analyzer analyzer = new Analyzer();
-    LogEntry infoEntry = entry("INFO");
-    Map<LogEntry, Integer> scored = Map.of(infoEntry, 1);
+    void entryBelowThreeIsNotFlagged() {
+        Analyzer analyzer = new Analyzer();
+        LogEntry infoEntry = entry("INFO");
+        Map<LogEntry, Integer> scored = Map.of(infoEntry, 1);
 
-    List<LogEntry> flagged = analyzer.buildFlaggedEntries(scored);
+        List<LogEntry> flagged = analyzer.buildFlaggedEntries(scored);
 
-    assertTrue(flagged.isEmpty());
-}
+        assertTrue(flagged.isEmpty());
+    }
 
-@Test
-void entryAtOrAboveThreeIsFlagged() {
-    Analyzer analyzer = new Analyzer();
-    LogEntry warnEntry = entry("WARN");
-    Map<LogEntry, Integer> scored = Map.of(warnEntry, 3);
+    @Test
+    void entryAtOrAboveThreeIsFlagged() {
+        Analyzer analyzer = new Analyzer();
+        LogEntry warnEntry = entry("WARN");
+        Map<LogEntry, Integer> scored = Map.of(warnEntry, 3);
 
-    List<LogEntry> flagged = analyzer.buildFlaggedEntries(scored);
+        List<LogEntry> flagged = analyzer.buildFlaggedEntries(scored);
 
-    assertEquals(1, flagged.size());
-    assertTrue(flagged.contains(warnEntry));
-   }
+        assertEquals(1, flagged.size());
+        assertTrue(flagged.contains(warnEntry));
+    }
+
+   @Test
+    void groupsEntriesByIpWithCorrectTotals() {
+        Analyzer analyzer = new Analyzer();
+        LogEntry flaggedEntry = entry("WARN");
+        LogEntry infoFromSameIp = entry("INFO");
+        LogEntry entryFromOtherIp = new LogEntry(LocalDateTime.now(), "INFO", "9.9.9.9", "/x", "y");
+
+        Map<LogEntry, Integer> scored = Map.of(
+                flaggedEntry, 3,
+                infoFromSameIp, 1,
+                entryFromOtherIp, 1
+        );
+
+        List<SuspiciousIp> suspicious = analyzer.buildSuspiciousIps(scored);
+
+        assertEquals(1, suspicious.size());
+        assertEquals("1.2.3.4", suspicious.get(0).ip());
+        assertEquals(2, suspicious.get(0).entryCount());
+    }
 
 }
