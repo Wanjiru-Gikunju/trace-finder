@@ -27,4 +27,20 @@ class LogParserTest {
         assertEquals("/login", entry.target());
         assertEquals("success", entry.action());
     }
+
+    @Test 
+    void missingFieldLineIsRecordedAsMalformed() {
+        //Arrange
+        LogParser parser = new LogParser();
+        String line = "2024-03-15 02:17:00 | WARN | 203.0.113.42 | /login";
+
+        //Act
+        ParseResult result = parser.parseLine(line, 23);
+
+        //Assert
+        assertNull(result.getEntry());
+        assertNotNull(result.getMalformedLine());
+        assertEquals(23, result.getMalformedLine().lineNumber());
+        assertEquals(line, result.getMalformedLine().rawContent());
+    }
 }
