@@ -43,4 +43,51 @@ class LogParserTest {
         assertEquals(23, result.getMalformedLine().lineNumber());
         assertEquals(line, result.getMalformedLine().rawContent());
     }
+
+    @Test 
+    void wrongDelimiterLineIsRecordedAsMalformed() {
+        //Arrange
+        LogParser parser = new LogParser();
+        String line = "2024-03-15 02:17:14 / INFO / 192.168.1.45 / /home / accessed";
+
+        //Act
+        ParseResult result = parser.parseLine(line, 51);
+
+        //Assert
+        assertNull(result.getEntry());
+        assertNotNull(result.getMalformedLine());
+        assertEquals(51, result.getMalformedLine().lineNumber());
+
+       } 
+
+        @Test 
+        void badTimestampLineIsRecordedAsMAlformed() {
+            //Arrange
+            LogParser parser = new LogParser();
+            String line = "not-a-timestamp | INFO | 192.168.1.45 | /home | accessed";
+
+            //Act
+            ParseResult result = parser.parseLine(line, 7);
+
+            //Assert
+            assertNull(result.getEntry());
+            assertNotNull(result.getMalformedLine());
+            assertEquals(7, result.getMalformedLine().lineNumber());
+        }
+
+        @Test 
+        void emptyLineIsRecordedAsMalformed() {
+            //Arrange
+            LogParser parser = new LogParser();
+            String line = "";
+
+            //Act
+            ParseResult result = parser.parseLine(line, 99);
+
+            //Assert
+            assertNull(result.getEntry());
+            assertNotNull(result.getMalformedLine());
+            assertEquals(99, result.getMalformedLine().lineNumber());
+        }
+    
 }
