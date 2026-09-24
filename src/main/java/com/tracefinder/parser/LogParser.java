@@ -6,20 +6,21 @@ import com.tracefinder.model.MalformedLine;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Optional;
 
 public class LogParser {
     private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public Optional<LogEntry> parseLine(String rawLine) {
-        if(rawLine == null || rawLine.isBlank()) {
-            return Optional.empty();
+    public ParseResult parseLine(String rawLine, int lineNumber) {
+        if (rawLine == null || rawLine.isBlank()) {
+            MalformedLine malformed = new MalformedLine(lineNumber, rawLine == null ? "" : rawLine);
+            return new ParseResult(null, malformed);
         }
 
-        String[] fields = rawLine.split("\\|"); 
+        String[] fields = rawLine.split("\\|");
 
-        if(fields.length != 5) {
-            return  Optional.empty();
+        if (fields.length != 5) {
+            MalformedLine malformed = new MalformedLine(lineNumber, rawLine);
+            return new ParseResult(null, malformed);
         }
 
         String timestampText = fields[0].trim();
@@ -31,12 +32,12 @@ public class LogParser {
         LocalDateTime timestamp;
         try {
             timestamp = LocalDateTime.parse(timestampText, TIMESTAMP_FORMAT);
-        }catch (DateTimeParseException e) {
-            return Optional.empty();
+        } catch (DateTimeParseException e) {
+            MalformedLine malformed = new MalformedLine(lineNumber, rawLine);
+            return new ParseResult(null, malformed);
         }
 
-        LogEntry entry = new LogEntry(timestamp,level,sourceIp, target, action);
-        return Optional.of(entry);
+        LogEntry entry = new LogEntry(timestamp, level, sourceIp, target, action);
+        return new ParseResult(entry, null);
     }
-    
 }
