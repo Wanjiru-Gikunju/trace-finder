@@ -3,7 +3,6 @@ package com.tracefinder;
 import com.tracefinder.analyzer.AnalysisResult;
 import com.tracefinder.analyzer.Analyzer;
 import com.tracefinder.model.LogEntry;
-import com.tracefinder.model.MalformedLine;
 import com.tracefinder.model.UnknownPattern;
 import com.tracefinder.parser.LogFileProcessor;
 import com.tracefinder.parser.LogFileReader;

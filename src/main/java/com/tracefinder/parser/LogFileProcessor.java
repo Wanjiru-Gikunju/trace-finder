@@ -1,6 +1,5 @@
 package com.tracefinder.parser;
 
-import com.tracefinder.model.LogEntry;
 import com.tracefinder.model.MalformedLine;
 
 import java.util.ArrayList;
