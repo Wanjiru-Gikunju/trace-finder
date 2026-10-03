@@ -36,10 +36,10 @@ public class Analyzer {
     return flagged;
   
    }
-   public List<SuspiciousIp> buildSuspiciousIps(Map<LogEntry, Integer> scoredEntries) {
-    Map<String, List<LogEntry>> entriesByIp = new HashMap<>();
+    public List<SuspiciousIp> buildSuspiciousIps(List<LogEntry> allEntries, Map<LogEntry, Integer> scoredEntries) {
+        Map<String, List<LogEntry>> entriesByIp = new HashMap<>();
 
-    for (LogEntry entry : scoredEntries.keySet()) {
+        for (LogEntry entry : allEntries) {
         String ip = entry.sourceIp();
         entriesByIp.computeIfAbsent(ip, key -> new ArrayList<>()).add(entry);
     }
@@ -52,7 +52,8 @@ public class Analyzer {
 
         boolean hasFlaggedEntry = false;
         for (LogEntry entry : entriesForIp) {
-            if (scoredEntries.get(entry) >= 3) {
+            Integer score = scoredEntries.get(entry);
+            if (score != null && score >= 3) {
                 hasFlaggedEntry = true;
                 break;
             }
@@ -72,10 +73,11 @@ public class Analyzer {
         return new ArrayList<>(unknownPatterns);
     }
 
-    public AnalysisResult analyze(List<LogEntry> knownEntries, Map<LogEntry, Integer> scoredEntries, List<UnknownPattern> unknownPatterns) {
+    public AnalysisResult analyze(List<LogEntry> knownEntries, List<LogEntry> allEntries,
+                                  Map<LogEntry, Integer> scoredEntries, List<UnknownPattern> unknownPatterns) {
         Map<String, Integer> summary = buildActivitySummary(knownEntries);
         List<LogEntry> flagged = buildFlaggedEntries(scoredEntries);
-        List<SuspiciousIp> suspicious = buildSuspiciousIps(scoredEntries);
+        List<SuspiciousIp> suspicious = buildSuspiciousIps(allEntries, scoredEntries);
         List<UnknownPattern> unknown = buildUnknownPatterns(unknownPatterns);
 
         return new AnalysisResult(summary, flagged, suspicious, unknown);

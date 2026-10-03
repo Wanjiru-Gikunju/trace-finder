@@ -8,7 +8,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class LogParser {
-    private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss")
+            .withResolverStyle(java.time.format.ResolverStyle.STRICT);
 
     public ParseResult parseLine(String rawLine, int lineNumber) {
         if (rawLine == null || rawLine.isBlank()) {
@@ -37,7 +38,7 @@ public class LogParser {
             return new ParseResult(null, malformed);
         }
 
-        LogEntry entry = new LogEntry(timestamp, level, sourceIp, target, action);
+        LogEntry entry = new LogEntry(timestamp, level, sourceIp, target, action, rawLine);
         return new ParseResult(entry, null);
     }
 }

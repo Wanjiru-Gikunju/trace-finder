@@ -16,8 +16,8 @@ If either command isn't recognised, make sure `JAVA_HOME` and Maven's `bin` fold
 Clone the repository and move into the project folder:
 
 ```
-git clone <repository-url>
-cd tracefinder
+git clone https://gitea.kood.tech/abigaelgikunju/trace-finder.git
+cd trace-finder
 ```
 
 No further setup is required — Maven will automatically download all dependencies (JUnit 5, etc.) the first time you build.

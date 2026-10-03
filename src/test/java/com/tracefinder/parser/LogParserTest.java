@@ -26,6 +26,7 @@ class LogParserTest {
         assertEquals("192.168.1.45", entry.sourceIp());
         assertEquals("/login", entry.target());
         assertEquals("success", entry.action());
+        assertEquals(line, entry.originalLine());
     }
 
     @Test 
@@ -87,7 +88,18 @@ class LogParserTest {
             //Assert
             assertNull(result.getEntry());
             assertNotNull(result.getMalformedLine());
-            assertEquals(99, result.getMalformedLine().lineNumber());
-        }
+        assertEquals(99, result.getMalformedLine().lineNumber());
+    }
+
+    @Test
+    void impossibleCalendarDateIsMalformed() {
+        LogParser parser = new LogParser();
+
+        ParseResult result = parser.parseLine(
+                "2024-02-30 02:14:08 | INFO | 192.168.1.45 | /login | success", 4);
+
+        assertNull(result.getEntry());
+        assertNotNull(result.getMalformedLine());
+    }
     
 }

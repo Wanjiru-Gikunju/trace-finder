@@ -93,6 +93,9 @@ public class ReportFormatter {
     }
 
     private String formatEntryLine(LogEntry entry) {
+        if (entry.originalLine() != null) {
+            return entry.originalLine();
+        }
         return entry.timestamp().format(TIMESTAMP_FORMAT) + " | " + entry.level() + " | "
                 + entry.sourceIp() + " | " + entry.target() + " | " + entry.action();
     }

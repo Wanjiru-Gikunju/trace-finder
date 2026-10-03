@@ -9,8 +9,13 @@ import java.time.LocalDateTime;
     String level,
     String sourceIp,
     String target,
-    String action
-  ) {}
+    String action,
+    String originalLine
+  ) {
+    public LogEntry(LocalDateTime timestamp, String level, String sourceIp, String target, String action) {
+      this(timestamp, level, sourceIp, target, action, null);
+    }
+  }
 
 
 /* Longer Verssion
