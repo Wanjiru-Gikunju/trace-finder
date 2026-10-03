@@ -61,8 +61,10 @@ public class Main {
         Map<LogEntry, Integer> scoredEntries = new HashMap<>();
         List<UnknownPattern> unknownPatterns = new ArrayList<>();
         List<LogEntry> knownEntries = new ArrayList<>();
+        List<LogEntry> allEntries = new ArrayList<>();
 
         for (NumberedEntry numberedEntry : parsedLog.entries()) {
+            allEntries.add(numberedEntry.entry());
             MatchResult matchResult = matcher.match(numberedEntry.entry(), rulebook, numberedEntry.lineNumber());
 
             if (matchResult.getScoredEntry() != null) {
@@ -74,7 +76,7 @@ public class Main {
         }
 
         Analyzer analyzer = new Analyzer();
-        AnalysisResult analysisResult = analyzer.analyze(knownEntries, scoredEntries, unknownPatterns);
+        AnalysisResult analysisResult = analyzer.analyze(knownEntries, allEntries, scoredEntries, unknownPatterns);
 
         ReportFormatter formatter = new ReportFormatter();
         String reportText = formatter.format(analysisResult, parsedLog.malformedLines(), LocalDateTime.now());

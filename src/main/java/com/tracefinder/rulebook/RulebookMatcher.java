@@ -18,6 +18,9 @@ public class RulebookMatcher {
     }
 
     private String formatEntry(LogEntry entry) {
+        if (entry.originalLine() != null) {
+            return entry.originalLine();
+        }
         return entry.timestamp() + " | " + entry.level() + " | " + entry.sourceIp()
                 + " | " + entry.target() + " | " + entry.action();
     }

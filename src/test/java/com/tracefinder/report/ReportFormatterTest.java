@@ -67,4 +67,16 @@ class ReportFormatterTest {
 
         assertTrue(report.contains("None found"));
     }
+
+    @Test
+    void flaggedEntryPreservesItsOriginalSpacing() {
+        String originalLine = "2024-03-15 02:16:02 | ALERT | 203.0.113.42  | /etc/passwd   | read";
+        LogEntry entry = new LogEntry(LocalDateTime.of(2024, 3, 15, 2, 16, 2),
+                "ALERT", "203.0.113.42", "/etc/passwd", "read", originalLine);
+        AnalysisResult result = new AnalysisResult(Map.of(), List.of(entry), List.of(), List.of());
+
+        String report = new ReportFormatter().format(result, List.of(), LocalDateTime.of(2024, 3, 15, 9, 0));
+
+        assertTrue(report.contains(originalLine));
+    }
 }

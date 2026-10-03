@@ -52,6 +52,16 @@ class AnalyzerTest {
         assertTrue(flagged.contains(warnEntry));
     }
 
+    @Test
+    void entryAboveThreeIsFlagged() {
+        Analyzer analyzer = new Analyzer();
+        LogEntry alertEntry = entry("ALERT");
+
+        List<LogEntry> flagged = analyzer.buildFlaggedEntries(Map.of(alertEntry, 9));
+
+        assertEquals(List.of(alertEntry), flagged);
+    }
+
    @Test
     void groupsEntriesByIpWithCorrectTotals() {
         Analyzer analyzer = new Analyzer();
@@ -65,10 +75,24 @@ class AnalyzerTest {
                 entryFromOtherIp, 1
         );
 
-        List<SuspiciousIp> suspicious = analyzer.buildSuspiciousIps(scored);
+        List<SuspiciousIp> suspicious = analyzer.buildSuspiciousIps(
+                List.of(flaggedEntry, infoFromSameIp, entryFromOtherIp), scored);
 
         assertEquals(1, suspicious.size());
         assertEquals("1.2.3.4", suspicious.get(0).ip());
+        assertEquals(2, suspicious.get(0).entryCount());
+    }
+
+    @Test
+    void suspiciousIpCountIncludesUnknownLevelEntries() {
+        Analyzer analyzer = new Analyzer();
+        LogEntry flaggedEntry = entry("WARN");
+        LogEntry unknownEntry = entry("CRIT");
+
+        List<SuspiciousIp> suspicious = analyzer.buildSuspiciousIps(
+                List.of(flaggedEntry, unknownEntry), Map.of(flaggedEntry, 3));
+
+        assertEquals(1, suspicious.size());
         assertEquals(2, suspicious.get(0).entryCount());
     }
 

@@ -31,4 +31,14 @@ class RulebookLoaderTest {
         assertEquals(5, rulebook.get("ERROR"));
         assertEquals(9, rulebook.get("ALERT"));
     }
+
+    @Test
+    void rejectsMissingOrUnexpectedCsvColumns() {
+        RulebookLoader loader = new RulebookLoader();
+
+        assertThrows(IllegalArgumentException.class,
+                () -> loader.parseRulebookLines(List.of("level,score", "INFO,1")));
+        assertThrows(IllegalArgumentException.class,
+                () -> loader.parseRulebookLines(List.of("level,severity_score", "INFO,1,extra")));
+    }
 }
